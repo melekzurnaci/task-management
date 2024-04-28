@@ -7,11 +7,14 @@ import {
   Post,
   Patch,
   Query,
+  UseFilters,
+  NotFoundException,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { Task, TaskStatus } from './task.modul';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { GetTasksFilterDTO } from './dto/get-tasks-filter.dto';
+import { UpdateTaskStatusDTO } from './dto/update-task-status.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -32,7 +35,15 @@ export class TasksController {
   // Get a task
   @Get(':id')
   getTaskById(@Param('id') id: string): Task {
-    return this.tasksService.getTaskById(id);
+    // try to get task id is 'xxxxslkşlş'
+    const task = this.tasksService.getTaskById(id);
+    //if not found the task, throw the error (404 not found) -> it's a standart error.
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found...`);
+    }
+
+    return task;
+    // otherwise return found the task.
   }
 
   // creating task
@@ -45,14 +56,16 @@ export class TasksController {
   // Deleting a task
   @Delete(':id')
   deleteTaskById(@Param('id') id: string): void {
+    this.getTaskById(id);
     this.tasksService.deleteTask(id);
   }
 
   @Patch(':id')
   updateTaskStatus(
-    @Body('status') status: TaskStatus,
+    @Body() updateTaskStatusDTO: UpdateTaskStatusDTO,
     @Param('id') id: string,
   ): Task {
+    const { status } = updateTaskStatusDTO;
     return this.tasksService.updateTaskStatus(id, status);
   }
 }
