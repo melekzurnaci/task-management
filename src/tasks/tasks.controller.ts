@@ -11,13 +11,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Task, TaskStatus } from './task.modul';
+import { TaskStatus } from './task-status.enum';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { GetTasksFilterDTO } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDTO } from './dto/update-task-status.dto';
 
 @Controller('tasks')
 export class TasksController {
+  /*
   //this line is kind of a injection.
   constructor(private tasksService: TasksService) {}
 
@@ -67,5 +68,5 @@ export class TasksController {
   ): Task {
     const { status } = updateTaskStatusDTO;
     return this.tasksService.updateTaskStatus(id, status);
-  }
+  } */
 }
