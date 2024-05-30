@@ -7,14 +7,12 @@ import {
   Post,
   Patch,
   Query,
-  UseFilters,
-  NotFoundException,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { Task, TaskStatus } from './task.modul';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { GetTasksFilterDTO } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDTO } from './dto/update-task-status.dto';
+import { Task } from './task.entity';
 
 @Controller('tasks')
 export class TasksController {
@@ -23,48 +21,34 @@ export class TasksController {
 
   //  get all Task data
   @Get()
-  getTasks(@Query() filterDTO: GetTasksFilterDTO): Task[] {
-    // if we have anyilters defined, call tasksService.getTasksWithFilters
-    // otherwise, just get all tasks
-    if (Object.keys(filterDTO).length) {
-      return this.tasksService.getTasksWithFilters(filterDTO);
-    }
-    return this.tasksService.getAllTasks();
+  getTasks(@Query() filterDTO: GetTasksFilterDTO): Promise<Task[]> {
+    return this.tasksService.getTasks(filterDTO);
   }
 
   // Get a task
   @Get(':id')
-  getTaskById(@Param('id') id: string): Task {
-    // try to get task id is 'xxxxslkşlş'
-    const task = this.tasksService.getTaskById(id);
-    //if not found the task, throw the error (404 not found) -> it's a standart error.
-    if (!task) {
-      throw new NotFoundException(`Task with ID ${id} not found...`);
-    }
-
-    return task;
-    // otherwise return found the task.
+  getTaskById(@Param('id') id: string): Promise<Task> {
+    return this.tasksService.getTaskById(id);
   }
 
   // creating task
   @Post()
-  createTask(@Body() createTaskDTO: CreateTaskDTO) {
-    // console.log('body: ', description);
+  createTask(@Body() createTaskDTO: CreateTaskDTO): Promise<Task> {
     return this.tasksService.createTask(createTaskDTO);
   }
 
   // Deleting a task
   @Delete(':id')
-  deleteTaskById(@Param('id') id: string): void {
-    this.getTaskById(id);
-    this.tasksService.deleteTask(id);
+  deleteTaskById(@Param('id') id: string): Promise<void> {
+    return this.tasksService.deleteTask(id);
   }
 
+  // Update task-status
   @Patch(':id')
   updateTaskStatus(
     @Body() updateTaskStatusDTO: UpdateTaskStatusDTO,
     @Param('id') id: string,
-  ): Task {
+  ): Promise<Task> {
     const { status } = updateTaskStatusDTO;
     return this.tasksService.updateTaskStatus(id, status);
   }
