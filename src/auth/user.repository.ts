@@ -6,6 +6,7 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 export class UserRepository extends Repository<User> {
   constructor(
@@ -21,7 +22,11 @@ export class UserRepository extends Repository<User> {
   // custom repo
   async createUser(authCredentialsDTO: AuthCredentialsDTO): Promise<void> {
     const { userName, password } = authCredentialsDTO;
-    const user = this.create({ userName, password });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = this.create({ userName, password: hashedPassword });
     try {
       await this.save(user);
     } catch (error) {
