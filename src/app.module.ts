@@ -3,6 +3,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './tasks/task.entity';
 import { TasksRepository } from './tasks/tasks.repository';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TasksModule,
@@ -17,6 +18,7 @@ import { TasksRepository } from './tasks/tasks.repository';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    AuthModule,
   ],
 })
 export class AppModule {}
